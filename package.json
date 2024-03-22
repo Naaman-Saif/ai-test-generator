@@ -1,0 +1,56 @@
+{
+  "name": "ai-test-generator",
+  "displayName": "ai-test-generator",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ai-test-generator.readFile",
+        "title": "read project files"
+      },
+      {
+        "command": "ai-test-generator.writeFile",
+        "title": "create test folder and file"
+      },
+      {
+        "command": "ai-test-generator.quickPick",
+        "title": "Select JS file for test generation"
+      },
+      {
+        "command": "ai-test-generator.createChatPanel",
+        "title": "Open Chat Panel for GemTest"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.87.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.3.1"
+  }
+}
