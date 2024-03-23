@@ -9,10 +9,17 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "workspaceContains:**/*.js"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "ai-test-generator.helloWorld",
+        "title": "Hello World"
+      },
       {
         "command": "ai-test-generator.readFile",
         "title": "read project files"
@@ -27,9 +34,27 @@
       },
       {
         "command": "ai-test-generator.createChatPanel",
-        "title": "Open Chat Panel for GemTest"
+        "title": "Chat Panel for GemTest"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gem",
+          "title": "AI Test Generator",
+          "icon": "resources/crosshair-bold.svg"
+        }
+      ]
+    },
+    "views": {
+      "gem": [
+        {
+          "id": "gem.chatView",
+          "type": "webview",
+          "name": "Chat"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
