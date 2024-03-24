@@ -1,6 +1,6 @@
 {
-  "name": "ai-test-generator",
-  "displayName": "ai-test-generator",
+  "name": "CodeTestify",
+  "displayName": "CodeTestify",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -17,44 +17,27 @@
   "contributes": {
     "commands": [
       {
-        "command": "ai-test-generator.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "ai-test-generator.readFile",
-        "title": "read project files"
-      },
-      {
-        "command": "ai-test-generator.writeFile",
-        "title": "create test folder and file"
-      },
-      {
-        "command": "ai-test-generator.quickPick",
-        "title": "Select JS file for test generation"
-      },
-      {
-        "command": "ai-test-generator.createChatPanel",
-        "title": "Chat Panel for GemTest"
+        "command": "code-testify.generate",
+        "title": "Code Testify: Generate Test"
       }
     ],
-    "viewsContainers": {
-      "activitybar": [
+    "menus": {
+      "editor/context": [
         {
-          "id": "gem",
-          "title": "AI Test Generator",
-          "icon": "resources/crosshair-bold.svg"
+          "command": "code-testify.generate",
+          "when": "editorHasSelection",
+          "group": "code-testify-group@1"
         }
       ]
     },
-    "views": {
-      "gem": [
-        {
-          "id": "gem.chatView",
-          "type": "webview",
-          "name": "Chat"
-        }
-      ]
-    }
+    "keybindings": [
+      {
+        "command": "code-testify.generate",
+        "key": "ctrl+k ctrl+t",
+        "mac": "cmd+k cmd+t",
+        "when": "editorHasSelection"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
@@ -76,6 +59,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.3.1"
+    "socket.io-client": "^4.7.5"
   }
 }

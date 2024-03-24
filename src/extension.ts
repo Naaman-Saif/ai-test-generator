@@ -1,45 +1,66 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from "vscode";
+import vscode from "vscode";
+import * as socketIO from "socket.io-client";
 
-// import { ICodeFile } from "./types";
-// import getReadProjectFilesCmd from "./commands/read-project-files";
-// import getPickFilesForTestGenCmd from "./commands/pick-file-for-test-gen";
-// import getCreateTestGenFileCmd from "./commands/create-test-gen-file";
-// import getOpenChatPanelCmd from "./commands/open-chat-panel";
-import GeminiViewProvider from "./view-providers/gemini-view-provider";
+let socket: socketIO.Socket;
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "ai-test-generator" is now active!'
+  socket = socketIO.io("http://localhost:3000", {
+    reconnectionDelayMax: 10000,
+  });
+
+  const generateCmd = vscode.commands.registerCommand(
+    "code-testify.generate",
+    () => {
+      const editor = vscode.window.activeTextEditor;
+      if (editor) {
+        const document = editor.document;
+        const selection = editor.selection;
+
+        // Get the selected text
+        const text = document.getText(selection);
+
+        // Emit the socket event
+        socket.emit("generate-test", {
+          fileName: document.fileName,
+          input: text,
+        });
+      }
+    }
   );
 
-  const geminiViewProvier = new GeminiViewProvider(context.extensionUri);
+  const showGenCodeCmd = vscode.commands.registerCommand(
+    "code-testify.showGenCode",
+    (genCode: string) => {
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: "Generating code...",
+          cancellable: false,
+        },
+        async () => {
+          const doc = await vscode.workspace.openTextDocument({
+            language: "javascript",
+            content: genCode,
+          });
 
-  const renderGeminiChatView = vscode.window.registerWebviewViewProvider(
-    GeminiViewProvider.viewType,
-    geminiViewProvier,
-    { webviewOptions: { retainContextWhenHidden: true } }
+          vscode.window.showTextDocument(doc, {
+            viewColumn: vscode.ViewColumn.Beside,
+            preview: false,
+          });
+        }
+      );
+    }
   );
 
-  // const codeFileContents: ICodeFile[] = [];
+  socket.on("generate-test", (data) => {
+    vscode.commands.executeCommand("code-testify.showGenCode", data);
+  });
 
-  // const readProjectFilesCmd = getReadProjectFilesCmd(codeFileContents);
-  // const pickFilesForTestGenCmd = getPickFilesForTestGenCmd(codeFileContents);
-  // const createTestGenFileCmd = getCreateTestGenFileCmd(codeFileContents[0]);
-  // const openChatPanelCmd = getOpenChatPanelCmd(context);
-
-  context.subscriptions.push(
-    renderGeminiChatView,
-    // readProjectFilesCmd,
-    // pickFilesForTestGenCmd,
-    // createTestGenFileCmd,
-    // openChatPanelCmd
-  );
+  context.subscriptions.push(generateCmd, showGenCodeCmd);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  if (socket) {
+    socket.disconnect();
+  }
+}
