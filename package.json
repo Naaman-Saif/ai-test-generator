@@ -19,6 +19,10 @@
       {
         "command": "code-testify.generate",
         "title": "Code Testify: Generate Test"
+      },
+      {
+        "command": "code-testify.fix",
+        "title": "Code Testify: Find and fix bugs"
       }
     ],
     "menus": {
@@ -27,6 +31,11 @@
           "command": "code-testify.generate",
           "when": "editorHasSelection",
           "group": "code-testify-group@1"
+        },
+        {
+          "command": "code-testify.fix",
+          "when": "editorHasSelection",
+          "group": "code-testify-group@2"
         }
       ]
     },
@@ -35,6 +44,12 @@
         "command": "code-testify.generate",
         "key": "ctrl+k ctrl+t",
         "mac": "cmd+k cmd+t",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "code-testify.fix",
+        "key": "ctrl+k ctrl+y",
+        "mac": "cmd+k cmd+y",
         "when": "editorHasSelection"
       }
     ]

@@ -28,6 +28,23 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const fixCmd = vscode.commands.registerCommand("code-testify.fix", () => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const document = editor.document;
+      const selection = editor.selection;
+
+      // Get the selected text
+      const text = document.getText(selection);
+
+      // Emit the socket event
+      socket.emit("find-bugs-and-fix", {
+        fileName: document.fileName,
+        input: text,
+      });
+    }
+  });
+
   const showGenCodeCmd = vscode.commands.registerCommand(
     "code-testify.showGenCode",
     (genCode: string) => {
@@ -56,7 +73,11 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand("code-testify.showGenCode", data);
   });
 
-  context.subscriptions.push(generateCmd, showGenCodeCmd);
+  socket.on("find-bugs-and-fix", (data) => {
+    vscode.commands.executeCommand("code-testify.showGenCode", data);
+  });
+
+  context.subscriptions.push(generateCmd, showGenCodeCmd, fixCmd);
 }
 
 export function deactivate() {
