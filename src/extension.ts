@@ -18,11 +18,6 @@ function registerCommands(context: vscode.ExtensionContext) {
     () => handleCommand("generate-test")
   );
 
-  const fixCmd = vscode.commands.registerCommand(
-    "code-testify.fix",
-    () => handleCommand("find-bugs-and-fix")
-  );
-
   const showGenCodeCmd = vscode.commands.registerCommand(
     "code-testify.showGenCode",
     (genCode: string) => {
@@ -47,7 +42,7 @@ function registerCommands(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(generateCmd, fixCmd, showGenCodeCmd);
+  context.subscriptions.push(generateCmd, showGenCodeCmd);
 }
 
 async function handleCommand(commandType: string) {
