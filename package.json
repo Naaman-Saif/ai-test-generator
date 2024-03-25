@@ -1,13 +1,24 @@
 {
-  "name": "CodeTestify",
+  "name": "code-testify",
   "displayName": "CodeTestify",
-  "description": "",
-  "version": "0.0.1",
+  "description": "Generate unit tests for your javascript or typescript code",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.87.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "unit test",
+    "test",
+    "js testing",
+    "javascript testing",
+    "ts testing",
+    "typescript testing",
+    "test generation",
+    "ai",
+    "gemini"
   ],
   "activationEvents": [
     "onLanguage:javascript",
@@ -55,6 +66,7 @@
     "@typescript-eslint/parser": "^7.0.2",
     "@vscode/test-cli": "^0.0.6",
     "@vscode/test-electron": "^2.3.9",
+    "esbuild": "^0.20.2",
     "eslint": "^8.56.0",
     "typescript": "^5.3.3"
   },

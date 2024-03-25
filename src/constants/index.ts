@@ -1,1 +1,1 @@
-export const API_URL = "http://localhost:3000";
+export const API_URL = "http://ec2-13-233-238-31.ap-south-1.compute.amazonaws.com/";
