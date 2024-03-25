@@ -1,49 +1,27 @@
 import vscode from "vscode";
 import * as socketIO from "socket.io-client";
+import { API_URL } from "./constants";
 
 let socket: socketIO.Socket;
 
 export function activate(context: vscode.ExtensionContext) {
-  socket = socketIO.io("http://localhost:3000", {
+  socket = socketIO.io(API_URL, {
     reconnectionDelayMax: 10000,
   });
 
+  registerCommands(context);
+}
+
+function registerCommands(context: vscode.ExtensionContext) {
   const generateCmd = vscode.commands.registerCommand(
     "code-testify.generate",
-    () => {
-      const editor = vscode.window.activeTextEditor;
-      if (editor) {
-        const document = editor.document;
-        const selection = editor.selection;
-
-        // Get the selected text
-        const text = document.getText(selection);
-
-        // Emit the socket event
-        socket.emit("generate-test", {
-          fileName: document.fileName,
-          input: text,
-        });
-      }
-    }
+    () => handleCommand("generate-test")
   );
 
-  const fixCmd = vscode.commands.registerCommand("code-testify.fix", () => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
-      const document = editor.document;
-      const selection = editor.selection;
-
-      // Get the selected text
-      const text = document.getText(selection);
-
-      // Emit the socket event
-      socket.emit("find-bugs-and-fix", {
-        fileName: document.fileName,
-        input: text,
-      });
-    }
-  });
+  const fixCmd = vscode.commands.registerCommand(
+    "code-testify.fix",
+    () => handleCommand("find-bugs-and-fix")
+  );
 
   const showGenCodeCmd = vscode.commands.registerCommand(
     "code-testify.showGenCode",
@@ -69,15 +47,43 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  socket.on("generate-test", (data) => {
-    vscode.commands.executeCommand("code-testify.showGenCode", data);
-  });
+  context.subscriptions.push(generateCmd, fixCmd, showGenCodeCmd);
+}
 
-  socket.on("find-bugs-and-fix", (data) => {
-    vscode.commands.executeCommand("code-testify.showGenCode", data);
-  });
+async function handleCommand(commandType: string) {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return;
 
-  context.subscriptions.push(generateCmd, showGenCodeCmd, fixCmd);
+  const document = editor.document;
+  const selection = editor.selection;
+  const text = document.getText(selection);
+
+  // Show progress notification
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Processing...",
+      cancellable: false,
+    },
+    async (progress, token): Promise<void> => {
+      const timeoutHandle = setTimeout(() => {
+        progress.report({ increment: 100 });
+      }, 3000); // Default hide after 3 seconds
+
+      socket.emit(commandType, {
+        fileName: document.fileName,
+        input: text,
+      });
+
+      return new Promise((resolve) => {
+        socket.once(commandType, (data) => {
+          clearTimeout(timeoutHandle); // Clear the timeout as we got the response
+          vscode.commands.executeCommand("code-testify.showGenCode", data);
+          resolve();
+        });
+      });
+    }
+  );
 }
 
 export function deactivate() {
